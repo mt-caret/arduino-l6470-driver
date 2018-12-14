@@ -55,11 +55,31 @@
 #define REG_CONFIG_LEN     16
 #define REG_STATUS_LEN     16
 
+#define CMD_NOP          0b00000000
+#define CMD_SET_PARAM    0b00000000
+#define CMD_GET_PARAM    0b00100000
+#define CMD_RUN          0b01010000
+#define CMD_STEP_CLOCK   0b01011000
+#define CMD_MOVE         0b01000000
+#define CMD_GO_TO        0b01100000
+#define CMD_GO_TO_DIR    0b01101000
+#define CMD_GO_UNTIL     0b10000010
+#define CMD_RELEASE_SW   0b10010010
+#define CMD_GO_HOME      0b01110000
+#define CMD_GO_MARK      0b01111000
+#define CMD_RESET_POS    0b11011000
+#define CMD_RESET_DEVICE 0b11000000
+#define CMD_SOFT_STOP    0b10110000
+#define CMD_HARD_STOP    0b10111000
+#define CMD_SOFT_HI_Z    0b10100000
+#define CMD_HARD_HI_Z    0b10101000
+#define CMD_GET_STATUS   0b11010000
+
 class L6470 {
     const int chipSelectPin;
     const SPISettings spiSettings;
     uint8_t transferByte(uint8_t data);
-    uint16_t transferTwoBytes(uint16_t data);
+    uint16_t transferCommand(uint16_t data);
     uint32_t sendBytes(uint32_t value, uint8_t length);
   public:
     L6470(int chipSelectPin);
@@ -70,6 +90,8 @@ class L6470 {
     void run(bool forward, uint32_t speed);
     void softStop(void);
     void hardStop(void);
+    void softHiZ(void);
+    void hardHiZ(void);
     void resetDevice(void);
 };
 

@@ -23,7 +23,6 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);
   Serial.println("Sending SoftStop command");
   l6470.softStop();
-  //Serial.println("Setting led to low");
   delay(5000);
 
   Serial.print(l6470.getParam(REG_CONFIG, REG_CONFIG_LEN), HEX);

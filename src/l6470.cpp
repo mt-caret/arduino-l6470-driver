@@ -66,7 +66,7 @@ uint8_t L6470::transferByte(uint8_t data) {
   return output;
 }
 
-uint16_t L6470::transferTwoBytes(uint16_t data) {
+uint16_t L6470::transferCommand(uint16_t data) {
   uint16_t outputMSB = transferByte(data >> 8) << 8;
   uint16_t outputLSB = transferByte(data);
   uint16_t result = outputMSB | outputLSB;
@@ -91,14 +91,14 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
 
 void L6470::setParam(uint8_t param, uint32_t value, uint8_t length) {
   SPI.beginTransaction(spiSettings);
-  transferTwoBytes(param & 0b00011111);
+  transferCommand(CMD_SET_PARAM | (param & 0b00011111));
   sendBytes(value, length);
   SPI.endTransaction();
 }
 
 uint32_t L6470::getParam(uint8_t param, uint8_t length) {
   SPI.beginTransaction(spiSettings);
-  transferTwoBytes((param & 0b00011111) | 0b00100000);
+  transferCommand(CMD_GET_PARAM | (param & 0b00011111));
   uint32_t ret = 0;
   while (true) {
     ret |= transferByte(0x00);
@@ -112,33 +112,38 @@ uint32_t L6470::getParam(uint8_t param, uint8_t length) {
 
 void L6470::run(bool forward, uint32_t speed) {
   SPI.beginTransaction(spiSettings);
-  transferTwoBytes(0b01010000 | (forward ? 1 : 0));
+  transferCommand(CMD_RUN | (forward ? 1 : 0));
   sendBytes(speed & 0xffffff, 22);
   SPI.endTransaction();
 }
 
 void L6470::softStop(void) {
   SPI.beginTransaction(spiSettings);
-  transferTwoBytes(0b10110000);
+  transferCommand(CMD_SOFT_STOP);
   SPI.endTransaction();
 }
 
 void L6470::hardStop(void) {
   SPI.beginTransaction(spiSettings);
-  transferTwoBytes(0b10111000);
+  transferCommand(CMD_HARD_STOP);
+  SPI.endTransaction();
+}
+
+void L6470::softHiZ(void) {
+  SPI.beginTransaction(spiSettings);
+  transferCommand(CMD_SOFT_HI_Z);
+  SPI.endTransaction();
+}
+
+void L6470::hardHiZ(void) {
+  SPI.beginTransaction(spiSettings);
+  transferCommand(CMD_HARD_HI_Z);
   SPI.endTransaction();
 }
 
 void L6470::resetDevice(void) {
   SPI.beginTransaction(spiSettings);
-  transferTwoBytes(0b11000000);
+  transferCommand(CMD_RESET_DEVICE);
   SPI.endTransaction();
 }
 
-//void softHiZ(void) {
-//    SPI.transfer(0b10100000);
-//}
-//
-//void softHiZ(void) {
-//    SPI.transfer(0b10101000);
-//}
