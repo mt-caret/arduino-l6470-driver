@@ -113,7 +113,13 @@ uint32_t L6470::getParam(uint8_t param, uint8_t length) {
 void L6470::run(Direction direction, uint32_t speed) {
   SPI.beginTransaction(spiSettings);
   transferCommand(CMD_RUN | static_cast<uint8_t>(direction));
-  sendBytes(speed & 0xffffff, 22);
+  sendBytes(speed, 22);
+  SPI.endTransaction();
+}
+
+void L6470::stepClock(Direction direction) {
+  SPI.beginTransaction(spiSettings);
+  transferCommand(CMD_STEP_CLOCK | static_cast<uint8_t>(direction));
   SPI.endTransaction();
 }
 
