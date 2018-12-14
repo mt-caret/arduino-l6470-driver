@@ -75,9 +75,9 @@
 #define CMD_HARD_HI_Z    0b10101000
 #define CMD_GET_STATUS   0b11010000
 
-enum class Direction {
-  forward,
-  reverse
+enum class Direction : uint8_t {
+  forward = 1,
+  reverse = 0
 };
 
 class L6470 {
