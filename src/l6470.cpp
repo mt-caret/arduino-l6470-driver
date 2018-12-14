@@ -110,9 +110,9 @@ uint32_t L6470::getParam(uint8_t param, uint8_t length) {
   return ret;
 }
 
-void L6470::run(bool forward, uint32_t speed) {
+void L6470::run(Direction direction, uint32_t speed) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_RUN | (forward ? 1 : 0));
+  transferCommand(CMD_RUN | (direction == Direction::forward ? 1 : 0));
   sendBytes(speed & 0xffffff, 22);
   SPI.endTransaction();
 }

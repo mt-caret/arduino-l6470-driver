@@ -17,7 +17,7 @@ void setup() {
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Sending Run command");
-  l6470.run(true, 1000);
+  l6470.run(Direction::forward, 1000);
   delay(5000);
 
   digitalWrite(LED_BUILTIN, LOW);

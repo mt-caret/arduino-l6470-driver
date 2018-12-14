@@ -75,6 +75,11 @@
 #define CMD_HARD_HI_Z    0b10101000
 #define CMD_GET_STATUS   0b11010000
 
+enum class Direction {
+  forward,
+  reverse
+};
+
 class L6470 {
     const int chipSelectPin;
     const SPISettings spiSettings;
@@ -87,7 +92,7 @@ class L6470 {
     void initialize(void);
     void setParam(uint8_t param, uint32_t value, uint8_t length);
     uint32_t getParam(uint8_t param, uint8_t length);
-    void run(bool forward, uint32_t speed);
+    void run(Direction direction, uint32_t speed);
     void softStop(void);
     void hardStop(void);
     void softHiZ(void);
