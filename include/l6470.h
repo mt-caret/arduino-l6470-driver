@@ -54,13 +54,13 @@
 #define REG_STATUS_LEN     16
 
 class L6470 {
-public:
-  uint8_t getLength(uint8_t param);
-  void initialize(int chipSelectPin);
-  uint32_t getParam(int chipSelectPin, uint8_t param, uint8_t length);
-  void run(int chipSelectPin, bool forward, uint32_t speed);
-  void softStop(int chipSelectPin);
-  void resetDevice(int chipSelectPin);
+  public:
+    uint8_t getLength(uint8_t param);
+    void initialize(int chipSelectPin);
+    uint32_t getParam(int chipSelectPin, uint8_t param, uint8_t length);
+    void run(int chipSelectPin, bool forward, uint32_t speed);
+    void softStop(int chipSelectPin);
+    void resetDevice(int chipSelectPin);
 };
 
 #endif
