@@ -53,10 +53,6 @@ uint8_t L6470::getLength(uint8_t param) {
 }
 
 void L6470::initialize() {
-  SPI.begin();
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setClockDivider(SPI_CLOCK_DIV16);
-  SPI.setDataMode(SPI_MODE3);
   pinMode(chipSelectPin, OUTPUT);
   digitalWrite(chipSelectPin, HIGH);
 

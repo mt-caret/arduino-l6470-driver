@@ -11,7 +11,6 @@ L6470 l6470(SPI_CS);
 void setup() {
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
-  //l6470 = L6470(SPI_CS);
   l6470.initialize();
 }
 
