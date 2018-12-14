@@ -61,11 +61,11 @@ class L6470 {
     uint8_t transferByte(uint8_t data);
     uint16_t transferTwoBytes(uint16_t data);
     uint32_t sendBytes(uint32_t value, uint8_t length);
-    void setParam(uint8_t param, uint32_t value, uint8_t length);
   public:
     L6470(int chipSelectPin);
     uint8_t getLength(uint8_t param);
     void initialize(void);
+    void setParam(uint8_t param, uint32_t value, uint8_t length);
     uint32_t getParam(uint8_t param, uint8_t length);
     void run(bool forward, uint32_t speed);
     void softStop(void);

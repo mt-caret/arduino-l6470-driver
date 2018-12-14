@@ -94,11 +94,14 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
 }
 
 void L6470::setParam(uint8_t param, uint32_t value, uint8_t length) {
+  SPI.beginTransaction(spiSettings);
   transferTwoBytes(param & 0b00011111);
   sendBytes(value, length);
+  SPI.endTransaction();
 }
 
 uint32_t L6470::getParam(uint8_t param, uint8_t length) {
+  SPI.beginTransaction(spiSettings);
   transferTwoBytes((param & 0b00011111) | 0b00100000);
   uint32_t ret = 0;
   while (true) {
@@ -107,24 +110,33 @@ uint32_t L6470::getParam(uint8_t param, uint8_t length) {
     ret = ret << 8;
     length -= 8;
   }
+  SPI.endTransaction();
   return ret;
 }
 
 void L6470::run(bool forward, uint32_t speed) {
+  SPI.beginTransaction(spiSettings);
   transferTwoBytes(0b01010000 | (forward ? 1 : 0));
   sendBytes(speed & 0xffffff, 22);
+  SPI.endTransaction();
 }
 
 void L6470::softStop(void) {
+  SPI.beginTransaction(spiSettings);
   transferTwoBytes(0b10110000);
+  SPI.endTransaction();
 }
 
 void L6470::hardStop(void) {
+  SPI.beginTransaction(spiSettings);
   transferTwoBytes(0b10111000);
+  SPI.endTransaction();
 }
 
 void L6470::resetDevice(void) {
-  transferTwoBytes( 0b11000000);
+  SPI.beginTransaction(spiSettings);
+  transferTwoBytes(0b11000000);
+  SPI.endTransaction();
 }
 
 //void softHiZ(void) {
