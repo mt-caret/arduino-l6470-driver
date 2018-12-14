@@ -1,6 +1,8 @@
 #ifndef L6470_H
 #define L6470_H
 
+#include "SPI.h"
+
 #define REG_ABS_POS    0x01 // 22 bits
 #define REG_EL_POS     0x02 //  9 bits
 #define REG_MARK       0x03 // 22 bits
@@ -54,13 +56,21 @@
 #define REG_STATUS_LEN     16
 
 class L6470 {
+    const int chipSelectPin;
+    const SPISettings spiSettings;
+    uint8_t transferByte(uint8_t data);
+    uint16_t transferTwoBytes(uint16_t data);
+    uint32_t sendBytes(uint32_t value, uint8_t length);
+    void setParam(uint8_t param, uint32_t value, uint8_t length);
   public:
+    L6470(int chipSelectPin);
     uint8_t getLength(uint8_t param);
-    void initialize(int chipSelectPin);
-    uint32_t getParam(int chipSelectPin, uint8_t param, uint8_t length);
-    void run(int chipSelectPin, bool forward, uint32_t speed);
-    void softStop(int chipSelectPin);
-    void resetDevice(int chipSelectPin);
+    void initialize(void);
+    uint32_t getParam(uint8_t param, uint8_t length);
+    void run(bool forward, uint32_t speed);
+    void softStop(void);
+    void hardStop(void);
+    void resetDevice(void);
 };
 
 #endif

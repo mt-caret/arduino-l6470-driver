@@ -15,6 +15,11 @@ other initialization tweaks:
 3. set k-values
 */
 
+L6470::L6470(int chipSelectPin)
+  : chipSelectPin(chipSelectPin)
+  , spiSettings (SPISettings(5000000, MSBFIRST, SPI_MODE3)) {
+}
+
 uint8_t L6470::getLength(uint8_t param) {
   switch (param) {
     case REG_ABS_POS:    return REG_ABS_POS_LEN;
@@ -47,7 +52,7 @@ uint8_t L6470::getLength(uint8_t param) {
   return 0;
 }
 
-void L6470::initialize(int chipSelectPin) {
+void L6470::initialize() {
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(SPI_CLOCK_DIV16);
@@ -55,30 +60,30 @@ void L6470::initialize(int chipSelectPin) {
   pinMode(chipSelectPin, OUTPUT);
   digitalWrite(chipSelectPin, HIGH);
 
-  resetDevice(chipSelectPin);
+  resetDevice();
 }
 
-uint8_t transferByte(int chipSelectPin, uint8_t data) {
+uint8_t L6470::transferByte(uint8_t data) {
   digitalWrite(chipSelectPin, LOW);
   uint8_t output = SPI.transfer(data);
   digitalWrite(chipSelectPin, HIGH);
   return output;
 }
 
-uint16_t transferTwoBytes(int chipSelectPin, uint16_t data) {
-  uint16_t outputMSB = transferByte(chipSelectPin, data >> 8) << 8;
-  uint16_t outputLSB = transferByte(chipSelectPin, data);
+uint16_t L6470::transferTwoBytes(uint16_t data) {
+  uint16_t outputMSB = transferByte(data >> 8) << 8;
+  uint16_t outputLSB = transferByte(data);
   uint16_t result = outputMSB | outputLSB;
   Serial.print(result, HEX);
   Serial.print('\n');
   return result;
 }
 
-uint32_t sendBytes(int chipSelectPin, uint32_t value, uint8_t length) {
+uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
   uint32_t result = 0;
   while (true) {
     uint8_t shift_amount = (length / 8) * 8;
-    result |= transferByte(chipSelectPin, (uint8_t) (value >> shift_amount));
+    result |= transferByte((uint8_t) (value >> shift_amount));
     if (shift_amount == 0) break;
     result <<= 8;
     length -= 8;
@@ -88,16 +93,16 @@ uint32_t sendBytes(int chipSelectPin, uint32_t value, uint8_t length) {
   return result;
 }
 
-void setParam(int chipSelectPin, uint8_t param, uint32_t value, uint8_t length) {
-  transferTwoBytes(chipSelectPin, param & 0b00011111);
-  sendBytes(chipSelectPin, value, length);
+void L6470::setParam(uint8_t param, uint32_t value, uint8_t length) {
+  transferTwoBytes(param & 0b00011111);
+  sendBytes(value, length);
 }
 
-uint32_t L6470::getParam(int chipSelectPin, uint8_t param, uint8_t length) {
-  transferTwoBytes(chipSelectPin, (param & 0b00011111) | 0b00100000);
+uint32_t L6470::getParam(uint8_t param, uint8_t length) {
+  transferTwoBytes((param & 0b00011111) | 0b00100000);
   uint32_t ret = 0;
   while (true) {
-    ret |= transferByte(chipSelectPin, 0x00);
+    ret |= transferByte(0x00);
     if (length <= 8) break;
     ret = ret << 8;
     length -= 8;
@@ -105,21 +110,21 @@ uint32_t L6470::getParam(int chipSelectPin, uint8_t param, uint8_t length) {
   return ret;
 }
 
-void L6470::run(int chipSelectPin, bool forward, uint32_t speed) {
-  transferTwoBytes(chipSelectPin, 0b01010000 | (forward ? 1 : 0));
-  sendBytes(chipSelectPin, speed & 0xffffff, 22);
+void L6470::run(bool forward, uint32_t speed) {
+  transferTwoBytes(0b01010000 | (forward ? 1 : 0));
+  sendBytes(speed & 0xffffff, 22);
 }
 
-void L6470::softStop(int chipSelectPin) {
-  transferTwoBytes(chipSelectPin, 0b10110000);
+void L6470::softStop(void) {
+  transferTwoBytes(0b10110000);
 }
 
-void hardStop(int chipSelectPin) {
-  transferTwoBytes(chipSelectPin, 0b10111000);
+void L6470::hardStop(void) {
+  transferTwoBytes(0b10111000);
 }
 
-void L6470::resetDevice(int chipSelectPin) {
-  transferTwoBytes(chipSelectPin, 0b11000000);
+void L6470::resetDevice(void) {
+  transferTwoBytes( 0b11000000);
 }
 
 //void softHiZ(void) {
