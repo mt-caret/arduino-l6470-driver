@@ -10,7 +10,7 @@ const int SPI_CS = 8;
 void setup() {
     Serial.begin(9600);
     pinMode(LED_BUILTIN, OUTPUT);
-    initialize_spi(SPI_CS);
+    initialize(SPI_CS);
 }
 
 void loop() {

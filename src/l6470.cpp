@@ -15,7 +15,39 @@ other initialization tweaks:
 3. set k-values
 */
 
-void initialize_spi(int chipSelectPin) {
+uint8_t getLength(uint8_t param) {
+  switch (param) {
+    case REG_ABS_POS:    return REG_ABS_POS_LEN;
+    case REG_EL_POS:     return REG_EL_POS_LEN;
+    case REG_MARK:       return REG_MARK_LEN;
+    case REG_SPEED:      return REG_SPEED_LEN;
+    case REG_ACC:        return REG_ACC_LEN;
+    case REG_DEC:        return REG_DEC_LEN;
+    case REG_MAX_SPEED:  return REG_MAX_SPEED_LEN;
+    case REG_MIN_SPEED:  return REG_MIN_SPEED_LEN;
+    case REG_FS_SPD:     return REG_FS_SPD_LEN;
+    case REG_KVAL_HOLD:  return REG_KVAL_HOLD_LEN;
+    case REG_KVAL_RUN:   return REG_KVAL_RUN_LEN;
+    case REG_KVAL_ACC:   return REG_KVAL_ACC_LEN;
+    case REG_KVAL_DEC:   return REG_KVAL_DEC_LEN;
+    case REG_INT_SPD:    return REG_INT_SPD_LEN;
+    case REG_ST_SLP:     return REG_ST_SLP_LEN;
+    case REG_FN_SLP_ACC: return REG_FN_SLP_ACC_LEN;
+    case REG_FN_SLP_DEC: return REG_FN_SLP_DEC_LEN;
+    case REG_K_THERM:    return REG_K_THERM_LEN;
+    case REG_ADC_OUT:    return REG_ADC_OUT_LEN;
+    case REG_OCD_TH:     return REG_OCD_TH_LEN;
+    case REG_STALL_TH:   return REG_STALL_TH_LEN;
+    case REG_STEP_MODE:  return REG_STEP_MODE_LEN;
+    case REG_ALARM_EN:   return REG_ALARM_EN_LEN;
+    case REG_CONFIG:     return REG_CONFIG_LEN;
+    case REG_STATUS:     return REG_STATUS_LEN;
+  }
+  // TODO: assert false here.
+  return 0;
+}
+
+void initialize(int chipSelectPin) {
     SPI.begin();
     SPI.setBitOrder(MSBFIRST);
     SPI.setClockDivider(SPI_CLOCK_DIV16);
