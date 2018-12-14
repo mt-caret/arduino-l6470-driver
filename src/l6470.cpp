@@ -15,7 +15,7 @@ other initialization tweaks:
 3. set k-values
 */
 
-uint8_t getLength(uint8_t param) {
+uint8_t L6470::getLength(uint8_t param) {
   switch (param) {
     case REG_ABS_POS:    return REG_ABS_POS_LEN;
     case REG_EL_POS:     return REG_EL_POS_LEN;
@@ -47,7 +47,7 @@ uint8_t getLength(uint8_t param) {
   return 0;
 }
 
-void initialize(int chipSelectPin) {
+void L6470::initialize(int chipSelectPin) {
     SPI.begin();
     SPI.setBitOrder(MSBFIRST);
     SPI.setClockDivider(SPI_CLOCK_DIV16);
@@ -93,7 +93,7 @@ void setParam(int chipSelectPin, uint8_t param, uint32_t value, uint8_t length) 
     sendBytes(chipSelectPin, value, length);
 }
 
-uint32_t getParam(int chipSelectPin, uint8_t param, uint8_t length) {
+uint32_t L6470::getParam(int chipSelectPin, uint8_t param, uint8_t length) {
     transferTwoBytes(chipSelectPin, (param & 0b00011111) | 0b00100000);
     uint32_t ret = 0;
     while (true) {
@@ -105,12 +105,12 @@ uint32_t getParam(int chipSelectPin, uint8_t param, uint8_t length) {
     return ret;
 }
 
-void run(int chipSelectPin, bool forward, uint32_t speed) {
+void L6470::run(int chipSelectPin, bool forward, uint32_t speed) {
     transferTwoBytes(chipSelectPin, 0b01010000 | (forward ? 1 : 0));
     sendBytes(chipSelectPin, speed & 0xffffff, 22);
 }
 
-void softStop(int chipSelectPin) {
+void L6470::softStop(int chipSelectPin) {
     transferTwoBytes(chipSelectPin, 0b10110000);
 }
 
@@ -118,7 +118,7 @@ void hardStop(int chipSelectPin) {
     transferTwoBytes(chipSelectPin, 0b10111000);
 }
 
-void resetDevice(int chipSelectPin) {
+void L6470::resetDevice(int chipSelectPin) {
     transferTwoBytes(chipSelectPin, 0b11000000);
 }
 
