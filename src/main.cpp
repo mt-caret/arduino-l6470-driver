@@ -12,12 +12,13 @@ void setup() {
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
   l6470.initialize();
+  l6470.setStepMode(StepMode::microstep_128);
 }
 
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Sending Run command");
-  l6470.run(Direction::forward, 1000);
+  l6470.run(Direction::forward, 3000);
   delay(2000);
 
   digitalWrite(LED_BUILTIN, LOW);
@@ -25,6 +26,6 @@ void loop() {
   l6470.softStop();
   delay(2000);
 
-  Serial.print(l6470.getParam(REG_CONFIG, REG_CONFIG_LEN), HEX);
+  Serial.print(l6470.getParam(REG_CONFIG), HEX);
   Serial.print('\n');
 }

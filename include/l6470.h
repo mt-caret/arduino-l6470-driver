@@ -91,6 +91,17 @@ enum class StepMode : uint8_t {
   microstep_128 = 0b111
 };
 
+enum class SyncMode : uint8_t {
+  half     = 0b000,
+  times_1  = 0b001,
+  times_2  = 0b010,
+  times_4  = 0b011,
+  times_8  = 0b100,
+  times_16 = 0b101,
+  times_32 = 0b110,
+  times_64 = 0b111,
+};
+
 class L6470 {
     const int chipSelectPin;
     const SPISettings spiSettings;
@@ -100,8 +111,8 @@ class L6470 {
     L6470(int chipSelectPin);
     uint8_t getLength(uint8_t param);
     void initialize(void);
-    void setParam(uint8_t param, uint32_t value, uint8_t length);
-    uint32_t getParam(uint8_t param, uint8_t length);
+    void setParam(uint8_t param, uint32_t value);
+    uint32_t getParam(uint8_t param);
     void run(Direction direction, uint32_t speed);
     void stepClock(Direction direction);
     void move(Direction direction, uint32_t steps);
@@ -112,6 +123,10 @@ class L6470 {
     void resetPos(void);
     void resetDevice(void);
     uint16_t getStatus(void);
+    void setStepMode(
+        StepMode stepMode,
+        bool enableSync = false,
+        SyncMode syncMode = SyncMode::half);
 };
 
 #endif

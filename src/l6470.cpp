@@ -58,6 +58,7 @@ void L6470::initialize() {
   digitalWrite(chipSelectPin, HIGH);
 
   resetDevice();
+  getStatus();
 }
 
 uint8_t L6470::transferByte(uint8_t data) {
@@ -74,7 +75,7 @@ uint8_t L6470::transferByte(uint8_t data) {
 uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
   uint32_t result = 0;
   while (true) {
-    uint8_t shift_amount = (length / 8) * 8;
+    uint8_t shift_amount = ((length - 1) / 8) * 8;
     result |= transferByte((uint8_t) (value >> shift_amount));
     if (shift_amount == 0) break;
     result <<= 8;
@@ -83,14 +84,16 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
   return result;
 }
 
-void L6470::setParam(uint8_t param, uint32_t value, uint8_t length) {
+void L6470::setParam(uint8_t param, uint32_t value) {
+  uint8_t length = getLength(param);
   SPI.beginTransaction(spiSettings);
   transferByte(CMD_SET_PARAM | (param & 0b00011111));
   sendBytes(value, length);
   SPI.endTransaction();
 }
 
-uint32_t L6470::getParam(uint8_t param, uint8_t length) {
+uint32_t L6470::getParam(uint8_t param) {
+  uint8_t length = getLength(param);
   SPI.beginTransaction(spiSettings);
   transferByte(CMD_GET_PARAM | (param & 0b00011111));
   uint32_t ret = 0;
@@ -162,10 +165,16 @@ void L6470::resetDevice(void) {
 
 uint16_t L6470::getStatus(void) {
   SPI.beginTransaction(spiSettings);
-  transferByte(CMD_RESET_DEVICE);
+  transferByte(CMD_GET_STATUS);
   uint16_t statusMSB = transferByte(CMD_NOP) << 8;
   uint16_t statusLSB = transferByte(CMD_NOP);
   SPI.endTransaction();
   return statusMSB | statusLSB;
 }
 
+void L6470::setStepMode(StepMode stepMode, bool enableSync, SyncMode syncMode) {
+  uint8_t syncEn = (enableSync ? 1 : 0) << 7;
+  uint8_t syncSel = static_cast<uint8_t>(syncMode) << 4;
+  uint8_t stepSel = static_cast<uint8_t>(stepMode);
+  setParam(REG_STEP_MODE, syncEn | syncSel | stepSel);
+}
