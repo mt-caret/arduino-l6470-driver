@@ -102,6 +102,13 @@ enum class SyncMode : uint8_t {
   times_64 = 0b111,
 };
 
+enum class KVal {
+  hold,
+  run,
+  acc,
+  dec
+};
+
 class L6470 {
     const int chipSelectPin;
     const SPISettings spiSettings;
@@ -127,6 +134,7 @@ class L6470 {
         StepMode stepMode,
         bool enableSync = false,
         SyncMode syncMode = SyncMode::half);
+    void setKVal(KVal kVal, uint8_t value);
 };
 
 #endif

@@ -13,6 +13,10 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   l6470.initialize();
   l6470.setStepMode(StepMode::microstep_128);
+  //l6470.setKVal(KVal::hold, 100);
+  //l6470.setKVal(KVal::run, 100);
+  //l6470.setKVal(KVal::acc, 100);
+  //l6470.setKVal(KVal::dec, 100);
 }
 
 void loop() {

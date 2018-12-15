@@ -178,3 +178,15 @@ void L6470::setStepMode(StepMode stepMode, bool enableSync, SyncMode syncMode) {
   uint8_t stepSel = static_cast<uint8_t>(stepMode);
   setParam(REG_STEP_MODE, syncEn | syncSel | stepSel);
 }
+
+void L6470::setKVal(KVal kVal, uint8_t value) {
+  uint8_t reg = REG_KVAL_HOLD;
+  switch (kVal) {
+    case KVal::hold: reg = REG_KVAL_HOLD; break;
+    case KVal::run: reg = REG_KVAL_RUN; break;
+    case KVal::acc: reg = REG_KVAL_ACC; break;
+    case KVal::dec: reg = REG_KVAL_DEC; break;
+    default: Serial.println("***ASSERT FALSE***"); // TODO: assert false 
+  }
+  setParam(reg, value);
+}
