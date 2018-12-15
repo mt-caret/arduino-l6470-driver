@@ -18,12 +18,12 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Sending Run command");
   l6470.run(Direction::forward, 1000);
-  delay(5000);
+  delay(2000);
 
   digitalWrite(LED_BUILTIN, LOW);
   Serial.println("Sending SoftStop command");
   l6470.softStop();
-  delay(5000);
+  delay(2000);
 
   Serial.print(l6470.getParam(REG_CONFIG, REG_CONFIG_LEN), HEX);
   Serial.print('\n');

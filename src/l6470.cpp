@@ -63,16 +63,11 @@ uint8_t L6470::transferByte(uint8_t data) {
   digitalWrite(chipSelectPin, LOW);
   uint8_t output = SPI.transfer(data);
   digitalWrite(chipSelectPin, HIGH);
-  return output;
-}
-
-uint16_t L6470::transferCommand(uint16_t data) {
-  uint16_t outputMSB = transferByte(data >> 8) << 8;
-  uint16_t outputLSB = transferByte(data);
-  uint16_t result = outputMSB | outputLSB;
-  Serial.print(result, HEX);
+  Serial.print(data, HEX);
+  Serial.print(" -> ");
+  Serial.print(output, HEX);
   Serial.print('\n');
-  return result;
+  return output;
 }
 
 uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
@@ -84,8 +79,6 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
     result <<= 8;
     length -= 8;
   }
-  Serial.print(result, HEX);
-  Serial.print('\n');
   return result;
 }
 

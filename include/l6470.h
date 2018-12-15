@@ -80,11 +80,21 @@ enum class Direction : uint8_t {
   reverse = 0
 };
 
+enum class StepMode : uint8_t {
+  fullStep      = 0b000,
+  halfStep      = 0b001,
+  microstep_4   = 0b010,
+  microstep_8   = 0b011,
+  microstep_16  = 0b100,
+  microstep_32  = 0b101,
+  microstep_64  = 0b110,
+  microstep_128 = 0b111
+};
+
 class L6470 {
     const int chipSelectPin;
     const SPISettings spiSettings;
     uint8_t transferByte(uint8_t data);
-    uint16_t transferCommand(uint16_t data);
     uint32_t sendBytes(uint32_t value, uint8_t length);
   public:
     L6470(int chipSelectPin);
