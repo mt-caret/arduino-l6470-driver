@@ -101,6 +101,7 @@ class L6470 {
     void hardHiZ(void);
     void resetPos(void);
     void resetDevice(void);
+    uint16_t getStatus(void);
 };
 
 #endif

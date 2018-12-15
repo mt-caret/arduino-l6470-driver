@@ -91,14 +91,14 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
 
 void L6470::setParam(uint8_t param, uint32_t value, uint8_t length) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_SET_PARAM | (param & 0b00011111));
+  transferByte(CMD_SET_PARAM | (param & 0b00011111));
   sendBytes(value, length);
   SPI.endTransaction();
 }
 
 uint32_t L6470::getParam(uint8_t param, uint8_t length) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_GET_PARAM | (param & 0b00011111));
+  transferByte(CMD_GET_PARAM | (param & 0b00011111));
   uint32_t ret = 0;
   while (true) {
     ret |= transferByte(0x00);
@@ -112,63 +112,66 @@ uint32_t L6470::getParam(uint8_t param, uint8_t length) {
 
 void L6470::run(Direction direction, uint32_t speed) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_RUN | static_cast<uint8_t>(direction));
+  transferByte(CMD_RUN | static_cast<uint8_t>(direction));
   sendBytes(speed, 22);
   SPI.endTransaction();
 }
 
 void L6470::stepClock(Direction direction) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_STEP_CLOCK | static_cast<uint8_t>(direction));
+  transferByte(CMD_STEP_CLOCK | static_cast<uint8_t>(direction));
   SPI.endTransaction();
 }
 
 void L6470::move(Direction direction, uint32_t steps) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_MOVE | static_cast<uint8_t>(direction));
+  transferByte(CMD_MOVE | static_cast<uint8_t>(direction));
   sendBytes(steps, 22);
   SPI.endTransaction();
 }
 
 void L6470::softStop(void) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_SOFT_STOP);
+  transferByte(CMD_SOFT_STOP);
   SPI.endTransaction();
 }
 
 void L6470::hardStop(void) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_HARD_STOP);
+  transferByte(CMD_HARD_STOP);
   SPI.endTransaction();
 }
 
 void L6470::softHiZ(void) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_SOFT_HI_Z);
+  transferByte(CMD_SOFT_HI_Z);
   SPI.endTransaction();
 }
 
 void L6470::hardHiZ(void) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_HARD_HI_Z);
+  transferByte(CMD_HARD_HI_Z);
   SPI.endTransaction();
 }
 
 void L6470::resetPos(void) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_RESET_POS);
+  transferByte(CMD_RESET_POS);
   SPI.endTransaction();
 }
 
 void L6470::resetDevice(void) {
   SPI.beginTransaction(spiSettings);
-  transferCommand(CMD_RESET_DEVICE);
+  transferByte(CMD_RESET_DEVICE);
   SPI.endTransaction();
 }
 
-//uint16_t L6470::getStatus(void) {
-//  SPI.beginTransaction(spiSettings);
-//  transferCommand(CMD_RESET_DEVICE);
-//  SPI.endTransaction();
-//}
+uint16_t L6470::getStatus(void) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_RESET_DEVICE);
+  uint16_t statusMSB = transferByte(CMD_NOP) << 8;
+  uint16_t statusLSB = transferByte(CMD_NOP);
+  SPI.endTransaction();
+  return statusMSB | statusLSB;
+}
 
