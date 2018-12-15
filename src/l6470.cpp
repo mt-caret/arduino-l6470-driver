@@ -53,6 +53,7 @@ uint8_t L6470::getLength(uint8_t param) {
 }
 
 void L6470::initialize() {
+  SPI.begin();
   pinMode(chipSelectPin, OUTPUT);
   digitalWrite(chipSelectPin, HIGH);
 
