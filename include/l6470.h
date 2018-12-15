@@ -94,10 +94,12 @@ class L6470 {
     uint32_t getParam(uint8_t param, uint8_t length);
     void run(Direction direction, uint32_t speed);
     void stepClock(Direction direction);
+    void move(Direction direction, uint32_t steps);
     void softStop(void);
     void hardStop(void);
     void softHiZ(void);
     void hardHiZ(void);
+    void resetPos(void);
     void resetDevice(void);
 };
 

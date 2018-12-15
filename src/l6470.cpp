@@ -123,6 +123,13 @@ void L6470::stepClock(Direction direction) {
   SPI.endTransaction();
 }
 
+void L6470::move(Direction direction, uint32_t steps) {
+  SPI.beginTransaction(spiSettings);
+  transferCommand(CMD_MOVE | static_cast<uint8_t>(direction));
+  sendBytes(steps, 22);
+  SPI.endTransaction();
+}
+
 void L6470::softStop(void) {
   SPI.beginTransaction(spiSettings);
   transferCommand(CMD_SOFT_STOP);
@@ -147,9 +154,21 @@ void L6470::hardHiZ(void) {
   SPI.endTransaction();
 }
 
+void L6470::resetPos(void) {
+  SPI.beginTransaction(spiSettings);
+  transferCommand(CMD_RESET_POS);
+  SPI.endTransaction();
+}
+
 void L6470::resetDevice(void) {
   SPI.beginTransaction(spiSettings);
   transferCommand(CMD_RESET_DEVICE);
   SPI.endTransaction();
 }
+
+//uint16_t L6470::getStatus(void) {
+//  SPI.beginTransaction(spiSettings);
+//  transferCommand(CMD_RESET_DEVICE);
+//  SPI.endTransaction();
+//}
 
