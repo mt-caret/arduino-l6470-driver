@@ -23,13 +23,25 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Sending Run command");
   l6470.run(Direction::forward, 3000);
+
+  l6470.updateStatus();
+  l6470.printStatus();
+
   delay(2000);
 
   digitalWrite(LED_BUILTIN, LOW);
   Serial.println("Sending SoftStop command");
   l6470.softStop();
-  delay(2000);
 
+  Serial.print("getParam result: ");
   Serial.print(l6470.getParam(REG_CONFIG), HEX);
   Serial.print('\n');
+
+  l6470.updateStatus();
+  l6470.printStatus();
+
+  delay(2000);
+  //Serial.print("getStatus result: ");
+  //Serial.print(l6470.getStatus(), HEX);
+  //Serial.print('\n');
 }

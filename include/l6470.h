@@ -80,6 +80,8 @@ enum class Direction : uint8_t {
   reverse = 0
 };
 
+String directionToString(Direction direction);
+
 enum class StepMode : uint8_t {
   fullStep      = 0b000,
   halfStep      = 0b001,
@@ -109,12 +111,48 @@ enum class KVal {
   dec
 };
 
+enum class SlewRate : uint8_t {
+  vpus_180 = 0b00,
+  vpus_290 = 0b10,
+  vpus_530 = 0b11,
+};
+
+enum class MotorState : uint8_t {
+  stopped = 0b00,
+  accelerating = 0b01,
+  decelerating = 0b10,
+  constantSpeed = 0b11
+};
+
+String motorStateToString(MotorState motorState);
+
+struct Status {
+  bool hiZ;                 // HiZ
+  bool undervoltageLockout; // UVLO
+  bool thermalWarning;      // TH_WRN
+  bool thermalShutdown;     // TH_SD
+  bool overcurrent;         // OCD
+  bool stepLossA;           // STEP_LOSS_A
+  bool stepLossB;           // STEP_LOSS_B
+  bool commandNotPerformed; // NOTPERF_CMD
+  bool commandDoesNotExist; // WRONG_CMD
+  bool switchClosed;        // SW_F
+  bool switchEvent;         // SW_EVN
+  bool busy;                // BUSY
+  bool stepClockMode;       // SCK_MOD
+  Direction direction;      // DIR
+  MotorState motorState;    // MOT_STATE
+};
+ // TODO: naming
+
 class L6470 {
     const int chipSelectPin;
     const SPISettings spiSettings;
     uint8_t transferByte(uint8_t data);
     uint32_t sendBytes(uint32_t value, uint8_t length);
+    uint16_t getStatus(void);
   public:
+    Status currentStatus;
     L6470(int chipSelectPin);
     uint8_t getLength(uint8_t param);
     void initialize(void);
@@ -129,12 +167,13 @@ class L6470 {
     void hardHiZ(void);
     void resetPos(void);
     void resetDevice(void);
-    uint16_t getStatus(void);
     void setStepMode(
         StepMode stepMode,
         bool enableSync = false,
         SyncMode syncMode = SyncMode::half);
     void setKVal(KVal kVal, uint8_t value);
+    void updateStatus(void);
+    void printStatus(void);
 };
 
 #endif

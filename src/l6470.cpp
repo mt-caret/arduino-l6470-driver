@@ -15,6 +15,24 @@ other initialization tweaks:
 3. set k-values
 */
 
+String directionToString(Direction direction) {
+  switch (direction) {
+    case Direction::forward: return "forward";
+    case Direction::reverse: return "reverse";
+  }
+  return ""; // TOOD: assert failure
+}
+
+String motorStateToString(MotorState motorState) {
+  switch (motorState) {
+    case MotorState::stopped:       return "stopped";
+    case MotorState::accelerating:  return "accelerating";
+    case MotorState::decelerating:  return "decelerating";
+    case MotorState::constantSpeed: return "constantSpeed";
+  }
+  return ""; // TOOD: assert false
+}
+
 L6470::L6470(int chipSelectPin)
   : chipSelectPin(chipSelectPin)
   , spiSettings (SPISettings(5000000, MSBFIRST, SPI_MODE3)) {
@@ -58,17 +76,17 @@ void L6470::initialize() {
   digitalWrite(chipSelectPin, HIGH);
 
   resetDevice();
-  getStatus();
+  updateStatus();
 }
 
 uint8_t L6470::transferByte(uint8_t data) {
   digitalWrite(chipSelectPin, LOW);
   uint8_t output = SPI.transfer(data);
   digitalWrite(chipSelectPin, HIGH);
-  Serial.print(data, HEX);
-  Serial.print(" -> ");
-  Serial.print(output, HEX);
-  Serial.print('\n');
+  //Serial.print(data, HEX);
+  //Serial.print(" -> ");
+  //Serial.print(output, HEX);
+  //Serial.print('\n');
   return output;
 }
 
@@ -189,4 +207,58 @@ void L6470::setKVal(KVal kVal, uint8_t value) {
     default: Serial.println("***ASSERT FALSE***"); // TODO: assert false 
   }
   setParam(reg, value);
+}
+
+void L6470::updateStatus(void) {
+  uint16_t status = getStatus();
+  currentStatus =
+  { .hiZ                 =   status & (1 <<  0)
+  , .undervoltageLockout = !(status & (1 <<  9))
+  , .thermalWarning      = !(status & (1 << 10))
+  , .thermalShutdown     = !(status & (1 << 11))
+  , .overcurrent         = !(status & (1 << 12))
+  , .stepLossA           =   status & (1 << 13)
+  , .stepLossB           =   status & (1 << 14)
+  , .commandNotPerformed =   status & (1 <<  7)
+  , .commandDoesNotExist =   status & (1 <<  8)
+  , .switchClosed        =   status & (1 <<  2)
+  , .switchEvent         =   status & (1 <<  3)
+  , .busy                = !(status & (1 <<  1))
+  , .stepClockMode       =   status & (1 << 15)
+  , .direction           =  (status & (1 <<  4)) ? Direction::forward : Direction::reverse
+  , .motorState          = static_cast<MotorState>((uint8_t) (status & (0b11 << 5)) >> 5)
+  };
+}
+
+void L6470::printStatus(void) {
+  Serial.print("hiZ:			");
+  Serial.println(currentStatus.hiZ);
+  Serial.print("undervoltageLockout:		");
+  Serial.println(currentStatus.undervoltageLockout);
+  Serial.print("thermalWarning:		");
+  Serial.println(currentStatus.thermalWarning);
+  Serial.print("thermalShutdown:		");
+  Serial.println(currentStatus.thermalShutdown);
+  Serial.print("overcurrent:		");
+  Serial.println(currentStatus.overcurrent);
+  Serial.print("stepLossA:			");
+  Serial.println(currentStatus.stepLossA);
+  Serial.print("stepLossB:			");
+  Serial.println(currentStatus.stepLossB);
+  Serial.print("commandNotPerformed:	");
+  Serial.println(currentStatus.commandNotPerformed);
+  Serial.print("commandDoesNotExist:		");
+  Serial.println(currentStatus.commandDoesNotExist);
+  Serial.print("switchClosed:		");
+  Serial.println(currentStatus.switchClosed);
+  Serial.print("switchEvent:		");
+  Serial.println(currentStatus.switchEvent);
+  Serial.print("busy:			");
+  Serial.println(currentStatus.busy);
+  Serial.print("stepClockMode:		");
+  Serial.println(currentStatus.stepClockMode);
+  Serial.print("direction:			");
+  Serial.println(directionToString(currentStatus.direction));
+  Serial.print("motorState:			");
+  Serial.println(motorStateToString(currentStatus.motorState));
 }
