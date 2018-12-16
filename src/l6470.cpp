@@ -295,10 +295,29 @@ void L6470::setKVal(KVal kVal, uint8_t value) {
 }
 
 void L6470::setStepMode(StepMode stepMode, bool enableSync, SyncMode syncMode) {
-  uint8_t syncEn = (enableSync ? 1 : 0) << 7;
+  uint8_t syncEn = enableSync ? 1 << 7 : 0;
   uint8_t syncSel = static_cast<uint8_t>(syncMode) << 4;
   uint8_t stepSel = static_cast<uint8_t>(stepMode);
   setParam(REG_STEP_MODE, syncEn | syncSel | stepSel);
+}
+
+void L6470::setConfig(
+  OscillatorSelect oscillatorSelect,
+  bool disableHardStopInterrupt,
+  bool shutdownBridgesOnOvercurrent,
+  SlewRate slewRate,
+  bool motorSupplyVoltageCompensation,
+  PWMFrequencyDivisionFactor pwmFrequencyDivisionFactor,
+  PWMFrequencyMultiplicationFactor pwmFrequencyMultiplicationFactor) {
+  uint16_t oscSel = static_cast<uint16_t>(oscillatorSelect);
+  uint16_t swMode = disableHardStopInterrupt ? 1 << 4 : 0;
+  uint16_t ocSD = shutdownBridgesOnOvercurrent ? 1 << 7 : 0;
+  uint16_t powSR = static_cast<uint16_t>(slewRate) << 8;
+  uint16_t enVSComp = motorSupplyVoltageCompensation ? 1 << 5 : 0;
+  uint16_t fPWMInt = static_cast<uint16_t>(pwmFrequencyDivisionFactor) << 13;
+  uint16_t fPWMDec = static_cast<uint16_t>(pwmFrequencyMultiplicationFactor) << 10;
+  setParam(REG_CONFIG,
+      oscSel | swMode | ocSD | powSR | enVSComp | fPWMInt | fPWMDec);
 }
 
 void L6470::updateStatus(void) {

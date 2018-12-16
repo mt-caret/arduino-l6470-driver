@@ -122,6 +122,43 @@ enum class SlewRate : uint8_t {
   vpus_530 = 0b11,
 };
 
+enum class OscillatorSelect : uint8_t {
+  internal16MHzOutNone   = 0b0000,
+  internal16MHzOut2MHz   = 0b1000,
+  internal16MHzOut4MHz   = 0b1001,
+  internal16MHzOut8MHz   = 0b1010,
+  internal16MHzOut16MHz  = 0b1011,
+  external8MHz           = 0b0100,
+  external16MHz          = 0b0101,
+  external32MHz          = 0b0110,
+  external64MHz          = 0b0111,
+  external8MHzOutInvert  = 0b1100,
+  external16MHzOutInvert = 0b1101,
+  external32MHzOutInvert = 0b1110,
+  external64MHzOutInvert = 0b1111
+};
+
+enum class PWMFrequencyDivisionFactor : uint8_t {
+  by1 = 0b000,
+  by2 = 0b001,
+  by3 = 0b010,
+  by4 = 0b011,
+  by5 = 0b100,
+  by6 = 0b101,
+  by7 = 0b110,
+};
+
+enum class PWMFrequencyMultiplicationFactor : uint8_t {
+  by0_625 = 0b000,
+  by0_75  = 0b001,
+  by0_875 = 0b010,
+  by1     = 0b011,
+  by1_25  = 0b100,
+  by1_5   = 0b101,
+  by1_75  = 0b110,
+  by2     = 0b111,
+};
+
 enum class MotorState : uint8_t {
   stopped = 0b00,
   accelerating = 0b01,
@@ -194,6 +231,14 @@ class L6470 {
     void disableThreshold(void);
     void setThresholdStepsPerSecond(float speed);
     void setKVal(KVal kVal, uint8_t value);
+    void setConfig(
+        OscillatorSelect oscillatorSelect,
+        bool disableHardStopInterrupt,
+        bool shutdownBridgesOnOvercurrent,
+        SlewRate slewRate,
+        bool motorSupplyVoltageCompensation,
+        PWMFrequencyDivisionFactor pwmFrequencyDivisionFactor,
+        PWMFrequencyMultiplicationFactor pwmFrequencyMultiplicationFactor);
     void updateStatus(void);
     void printStatus(void);
 };
