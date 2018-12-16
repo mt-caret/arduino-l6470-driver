@@ -82,6 +82,11 @@ enum class Direction : uint8_t {
 
 String directionToString(Direction direction);
 
+enum class Action : uint8_t {
+  reset = 0,
+  copy = 1
+};
+
 enum class StepMode : uint8_t {
   fullStep      = 0b000,
   halfStep      = 0b001,
@@ -150,26 +155,33 @@ class L6470 {
     const SPISettings spiSettings;
     uint8_t transferByte(uint8_t data);
     uint32_t sendBytes(uint32_t value, uint8_t length);
-    uint16_t getStatus(void);
   public:
     Status currentStatus;
     L6470(int chipSelectPin);
     uint8_t getLength(uint8_t param);
     void initialize(void);
 
-    /* Basic Commands */
+    /* Raw Commands */
 
     void setParam(uint8_t param, uint32_t value);
     uint32_t getParam(uint8_t param);
+    void nop(void);
     void run(Direction direction, uint32_t speed);
     void stepClock(Direction direction);
     void move(Direction direction, uint32_t steps);
+    void goTo(uint32_t absolutePosition);
+    void goToDir(Direction direction, uint32_t absolutePosition);
+    void goUntil(Action action, Direction direction, uint32_t speed);
+    void releaseSW(Action action, Direction direction);
+    void goHome(void);
+    void goMark(void);
+    void resetPos(void);
+    void resetDevice(void);
     void softStop(void);
     void hardStop(void);
     void softHiZ(void);
     void hardHiZ(void);
-    void resetPos(void);
-    void resetDevice(void);
+    uint16_t getStatus(void);
 
     /* Convenience Functions */
 

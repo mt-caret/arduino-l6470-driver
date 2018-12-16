@@ -104,7 +104,7 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
   return result;
 }
 
-/* Basic Commands */
+/* Raw Commands */
 
 void L6470::setParam(uint8_t param, uint32_t value) {
   uint8_t length = getLength(param);
@@ -120,13 +120,19 @@ uint32_t L6470::getParam(uint8_t param) {
   transferByte(CMD_GET_PARAM | (param & 0b00011111));
   uint32_t ret = 0;
   while (true) {
-    ret |= transferByte(0x00);
+    ret |= transferByte(CMD_NOP);
     if (length <= 8) break;
     ret = ret << 8;
     length -= 8;
   }
   SPI.endTransaction();
   return ret;
+}
+
+void L6470::nop(void) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_NOP);
+  SPI.endTransaction();
 }
 
 void L6470::run(Direction direction, uint32_t speed) {
@@ -146,6 +152,63 @@ void L6470::move(Direction direction, uint32_t steps) {
   SPI.beginTransaction(spiSettings);
   transferByte(CMD_MOVE | static_cast<uint8_t>(direction));
   sendBytes(steps, 22);
+  SPI.endTransaction();
+}
+
+void L6470::goTo(uint32_t absolutePosition) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_GO_TO);
+  sendBytes(absolutePosition, 22);
+  SPI.endTransaction();
+}
+
+void L6470::goToDir(Direction direction, uint32_t absolutePosition) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_GO_TO_DIR | static_cast<uint8_t>(direction));
+  sendBytes(absolutePosition, 22);
+  SPI.endTransaction();
+}
+
+void L6470::goUntil(Action action, Direction direction, uint32_t speed) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(
+      CMD_GO_UNTIL |
+      (static_cast<uint8_t>(action) << 3) |
+      static_cast<uint8_t>(direction));
+  sendBytes(speed, 20);
+  SPI.endTransaction();
+}
+
+void L6470::releaseSW(Action action, Direction direction) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(
+      CMD_RELEASE_SW |
+      (static_cast<uint8_t>(action) << 3) |
+      static_cast<uint8_t>(direction));
+  SPI.endTransaction();
+}
+
+void L6470::goHome(void) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_GO_HOME);
+  SPI.endTransaction();
+}
+
+void L6470::goMark(void) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_GO_MARK);
+  SPI.endTransaction();
+}
+
+void L6470::resetPos(void) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_RESET_POS);
+  SPI.endTransaction();
+}
+
+void L6470::resetDevice(void) {
+  SPI.beginTransaction(spiSettings);
+  transferByte(CMD_RESET_DEVICE);
   SPI.endTransaction();
 }
 
@@ -170,18 +233,6 @@ void L6470::softHiZ(void) {
 void L6470::hardHiZ(void) {
   SPI.beginTransaction(spiSettings);
   transferByte(CMD_HARD_HI_Z);
-  SPI.endTransaction();
-}
-
-void L6470::resetPos(void) {
-  SPI.beginTransaction(spiSettings);
-  transferByte(CMD_RESET_POS);
-  SPI.endTransaction();
-}
-
-void L6470::resetDevice(void) {
-  SPI.beginTransaction(spiSettings);
-  transferByte(CMD_RESET_DEVICE);
   SPI.endTransaction();
 }
 
