@@ -13,6 +13,14 @@ other initialization tweaks:
 1. set max speed / full-stepping speed
 2. set maximum acceleration/deceleration speeds
 3. set k-values
+
+*/
+/*
+1 tick = 250ns = 250 * 10^-9 = 1 / (4 * 10^6)s
+MAX_SPEED -> 1 ~ 1023
+MAX_SPEED * 4 * 10^6 * 2^-18 = MAX_SPEED * 15.2587890625 step/s
+MIN_SPEED -> 0 ~ 2047
+MIN_SPEED * 4 * 10^6 * 2^-24 = MIN_SPEED * 0.2384185791015625 step/s
 */
 
 String directionToString(Direction direction) {
@@ -20,7 +28,8 @@ String directionToString(Direction direction) {
     case Direction::forward: return "forward";
     case Direction::reverse: return "reverse";
   }
-  return ""; // TOOD: assert failure
+  Serial.println("directionToString: ***ASSERT FALSE***"); // TODO: assert false here.
+  return "";
 }
 
 String motorStateToString(MotorState motorState) {
@@ -30,7 +39,8 @@ String motorStateToString(MotorState motorState) {
     case MotorState::decelerating:  return "decelerating";
     case MotorState::constantSpeed: return "constantSpeed";
   }
-  return ""; // TOOD: assert false
+  Serial.println("motorStateToString: ***ASSERT FALSE***"); // TODO: assert false here.
+  return "";
 }
 
 L6470::L6470(int chipSelectPin)
@@ -66,7 +76,7 @@ uint8_t L6470::getLength(uint8_t param) {
     case REG_CONFIG:     return REG_CONFIG_LEN;
     case REG_STATUS:     return REG_STATUS_LEN;
   }
-  // TODO: assert false here.
+  Serial.println("getLength: ***ASSERT FALSE***"); // TODO: assert false here.
   return 0;
 }
 
@@ -247,11 +257,29 @@ uint16_t L6470::getStatus(void) {
 
 /* Convenience Functions */
 
-void L6470::setStepMode(StepMode stepMode, bool enableSync, SyncMode syncMode) {
-  uint8_t syncEn = (enableSync ? 1 : 0) << 7;
-  uint8_t syncSel = static_cast<uint8_t>(syncMode) << 4;
-  uint8_t stepSel = static_cast<uint8_t>(stepMode);
-  setParam(REG_STEP_MODE, syncEn | syncSel | stepSel);
+#define MAX_OF_MAX_SPEED ((1 << 10) - 1)
+void L6470::setMaxStepPerSecond(float speed) {
+  uint16_t maxSpeed =
+    min((uint16_t) floor(max(0.0, speed) / 15.2587890625), MAX_OF_MAX_SPEED);
+  setParam(REG_MAX_SPEED, maxSpeed);
+}
+
+#define MAX_OF_MIN_SPEED ((1 << 12) - 1)
+void L6470::setMinStepPerSecond(float speed, bool enableOptimization) {
+  uint16_t minSpeed =
+    min((uint16_t) floor(max(0.0, speed) / 0.2384185791015625), MAX_OF_MIN_SPEED);
+  setParam(REG_MIN_SPEED, minSpeed | (enableOptimization ? (1 << 12) : 0));
+}
+
+#define MAX_THRESHOLD ((1 << 10) - 1)
+void L6470::disableThreshold(void) {
+  setParam(REG_FS_SPD, MAX_THRESHOLD);
+}
+
+void L6470::setThresholdStepsPerSecond(float speed) {
+  uint8_t threshold =
+    min((uint8_t) floor(max(0.0, speed) / 15.2587890625 + 0.5), MAX_THRESHOLD);
+  setParam(REG_FS_SPD, threshold);
 }
 
 void L6470::setKVal(KVal kVal, uint8_t value) {
@@ -261,9 +289,16 @@ void L6470::setKVal(KVal kVal, uint8_t value) {
     case KVal::run: reg = REG_KVAL_RUN; break;
     case KVal::acc: reg = REG_KVAL_ACC; break;
     case KVal::dec: reg = REG_KVAL_DEC; break;
-    default: Serial.println("***ASSERT FALSE***"); // TODO: assert false 
+    default: Serial.println("setKVal: ***ASSERT FALSE***"); // TODO: assert false
   }
   setParam(reg, value);
+}
+
+void L6470::setStepMode(StepMode stepMode, bool enableSync, SyncMode syncMode) {
+  uint8_t syncEn = (enableSync ? 1 : 0) << 7;
+  uint8_t syncSel = static_cast<uint8_t>(syncMode) << 4;
+  uint8_t stepSel = static_cast<uint8_t>(stepMode);
+  setParam(REG_STEP_MODE, syncEn | syncSel | stepSel);
 }
 
 void L6470::updateStatus(void) {

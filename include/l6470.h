@@ -189,6 +189,10 @@ class L6470 {
         StepMode stepMode,
         bool enableSync = false,
         SyncMode syncMode = SyncMode::half);
+    void setMaxStepPerSecond(float speed);
+    void setMinStepPerSecond(float speed, bool enableOptimization = false);
+    void disableThreshold(void);
+    void setThresholdStepsPerSecond(float speed);
     void setKVal(KVal kVal, uint8_t value);
     void updateStatus(void);
     void printStatus(void);
