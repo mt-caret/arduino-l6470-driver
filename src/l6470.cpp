@@ -79,6 +79,8 @@ void L6470::initialize() {
   updateStatus();
 }
 
+/* SPI Utility Functions */
+
 uint8_t L6470::transferByte(uint8_t data) {
   digitalWrite(chipSelectPin, LOW);
   uint8_t output = SPI.transfer(data);
@@ -101,6 +103,8 @@ uint32_t L6470::sendBytes(uint32_t value, uint8_t length) {
   }
   return result;
 }
+
+/* Basic Commands */
 
 void L6470::setParam(uint8_t param, uint32_t value) {
   uint8_t length = getLength(param);
@@ -189,6 +193,8 @@ uint16_t L6470::getStatus(void) {
   SPI.endTransaction();
   return statusMSB | statusLSB;
 }
+
+/* Convenience Functions */
 
 void L6470::setStepMode(StepMode stepMode, bool enableSync, SyncMode syncMode) {
   uint8_t syncEn = (enableSync ? 1 : 0) << 7;

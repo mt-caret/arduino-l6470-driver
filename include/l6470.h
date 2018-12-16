@@ -156,6 +156,9 @@ class L6470 {
     L6470(int chipSelectPin);
     uint8_t getLength(uint8_t param);
     void initialize(void);
+
+    /* Basic Commands */
+
     void setParam(uint8_t param, uint32_t value);
     uint32_t getParam(uint8_t param);
     void run(Direction direction, uint32_t speed);
@@ -167,6 +170,9 @@ class L6470 {
     void hardHiZ(void);
     void resetPos(void);
     void resetDevice(void);
+
+    /* Convenience Functions */
+
     void setStepMode(
         StepMode stepMode,
         bool enableSync = false,
