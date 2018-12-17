@@ -1,0 +1,21 @@
+{
+  "name": "arduino-l6470-driver",
+  "keywords": "SPI, l6470, driver",
+  "description": "Yet another Arduino library for the L6470 stepper motor driver",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/mt-caret/arduino-l6470-driver.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Masayuki Takeda",
+      "email": "mtakeda.enigsol@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "version": "0.0.1",
+  "frameworks": "arduino",
+  "platforms": "*"
+}
