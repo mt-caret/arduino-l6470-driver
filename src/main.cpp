@@ -48,6 +48,4 @@ void loop() {
   Serial.print("getStatus result: ");
   Serial.print(leftMotor.getStatus(), HEX);
   Serial.print('\n');
-  Serial.print(done, DEC);
-  Serial.print('\n');
 }
