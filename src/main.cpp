@@ -5,43 +5,49 @@
 #define LED_BUILTIN 13
 #endif
 
-const int SPI_CS = 8;
-L6470 l6470(SPI_CS);
+const int SPI_CS_LEFT = 8, SPI_CS_RIGHT = 9;
+L6470 leftMotor(SPI_CS_LEFT), rightMotor(SPI_CS_RIGHT);
 
 void setup() {
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
-  l6470.initialize();
-  l6470.setStepMode(StepMode::microstep_128);
-  //l6470.setKVal(KVal::hold, 100);
-  //l6470.setKVal(KVal::run, 100);
-  //l6470.setKVal(KVal::acc, 100);
-  //l6470.setKVal(KVal::dec, 100);
+  leftMotor.initialize();
+  rightMotor.initialize();
+  leftMotor.setStepMode(StepMode::microstep_128);
+  rightMotor.setStepMode(StepMode::microstep_128);
+  leftMotor.setKVal(KVal::hold, 255);
+  leftMotor.setKVal(KVal::run, 255);
+  leftMotor.setKVal(KVal::acc, 255);
+  leftMotor.setKVal(KVal::dec, 255);
 }
 
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Sending Run command");
-  l6470.run(Direction::forward, 3000);
+  leftMotor.run(Direction::forward, 4000);
+  rightMotor.run(Direction::forward, 4000);
 
-  l6470.updateStatus();
-  l6470.printStatus();
+  //leftMotor.updateStatus();
+  //leftMotor.printStatus();
 
-  delay(2000);
+  delay(10000);
 
   digitalWrite(LED_BUILTIN, LOW);
   Serial.println("Sending SoftStop command");
-  l6470.softStop();
+  leftMotor.softStop();
+  rightMotor.softStop();
 
   Serial.print("getParam result: ");
-  Serial.print(l6470.getParam(REG_CONFIG), HEX);
+  Serial.print(leftMotor.getParam(REG_CONFIG), HEX);
   Serial.print('\n');
 
-  l6470.updateStatus();
-  l6470.printStatus();
+  //leftMotor.updateStatus();
+  //leftMotor.printStatus();
 
-  delay(2000);
-  //Serial.print("getStatus result: ");
-  //Serial.print(l6470.getStatus(), HEX);
-  //Serial.print('\n');
+  delay(1000);
+  Serial.print("getStatus result: ");
+  Serial.print(leftMotor.getStatus(), HEX);
+  Serial.print('\n');
+  Serial.print(done, DEC);
+  Serial.print('\n');
 }
